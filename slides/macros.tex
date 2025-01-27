@@ -126,6 +126,22 @@
 	morestring=[b]"
 }
 
+\lstdefinelanguage{shell}{
+	basicstyle=\small\ttfamily,
+	keywords={python, python3, pip, pip3, srun, sbatch},
+	keywordstyle=\color{cyan},
+	ndkeywords={torch, distributed, launch},
+	ndkeywordstyle=\color{teal}\bfseries,
+	identifierstyle=\color{white},
+	sensitive=false,
+	comment=[l]{\#},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{green}\ttfamily,
+	stringstyle=\color{green}\ttfamily,
+	morestring=[b]',
+	morestring=[b]"
+}
+
 % To allow the theme files to be placed in a subdirectory
 \makeatletter
 	\def\beamer@calltheme#1#2#3{%

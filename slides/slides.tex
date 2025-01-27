@@ -46,7 +46,7 @@
 \begin{enumerate}
 \setlength{\parskip}{0.5em}
 \item MPI: Message Passing Interface
-\item Provides a standard for {\it disstributed memory parallelisation}
+\item Provides a standard for {\it distributed memory parallelisation}
 \item Gavin already explained the theory and practice
 \item Now let's apply it to some machine learning
 \end{enumerate}
@@ -58,6 +58,1016 @@
 \note{
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Motivation}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-0.5cm}
+GPUs are great for accelerated training and inference, but processing is bound by:
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Available memory
+\item Speed of computation
+\end{enumerate}
+How to make AI better?
+\begin{enumerate}
+\item Improved algorithms
+\item Larger models
+\item More training data
+\end{enumerate}
+The last two require {\it more compute}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Scaling up}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-0.5cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Strong motivation for scaling across GPUs
+\item Single device: 4 or 8 GPUs maximum
+\item Eventually want to scale across nodes
+\item Get this right... the sky's the limit
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Preparation}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Open \url{https://docs.baskerville.ac.uk/}
+\item Select \href{https://portal.baskerville.ac.uk/}{Baserville Portal}
+\item Login if necessary
+\item Select \href{https://portal.baskerville.ac.uk/pun/sys/dashboard/batch_connect/sys/bc_bask_jupyter/session_contexts/new}{JupyterLab} from the Interactive Apps list
+\item Configure a 2 hour session with 1 GPU on the project {\tt vjgo8416-training25} and the {\tt turing} queue
+\item Launch
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{launch-jupyterlab}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Types of model parallelism}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-0.5cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item DDP: Distributed Data Parallel
+\item FSDP: Fully Sharded Data Parallel
+\item DeepSpeed ZeRO: Zero Redundancy Optimiser
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Data parallel}
+
+\begin{columns}[T]
+\begin{column}[T]{0.9\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-0.5cm}
+\includegraphics[width=1.0\textwidth]{parallel-data}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Model parallel FSDP}
+
+\begin{columns}[T]
+\begin{column}[T]{0.7\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-1.5cm}
+\includegraphics[width=1.0\textwidth]{parallel-vertical}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Model parallel DeepSpeed}
+
+\begin{columns}[T]
+\begin{column}[T]{0.8\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{parallel-horizontal}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{DeepSpeed}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-0.5cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item DeepSpeed Stage 1: optimiser state partitioning
+\item DeepSpeed Stage 2: gradient partitioning
+\item DeepSpeed Stage 3: model parameter partitioning
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{The plan}
+
+\begin{columns}[T]
+\begin{column}[T]{0.7\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item No more theory
+\item Simplified GPT2 nano code for one GPU
+\item Andrej Karpathy: \url{https://youtu.be/l8pRSuU81PU}
+\item Extend to support Distributed Data Parallel
+\item Extend using PyTorch Lightning
+\end{enumerate}
+
+\end{column}
+\begin{column}[T]{0.3\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=0.9\textwidth]{karpathy}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{The intention}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Not to care too much about the model implementation
+\item Understand changes needed to add MPI functionality
+\item For this, we'll rely heavily on {\tt diff}s
+\item Using JupyterLab and SLURM
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Your most important tools}
+
+\begin{columns}[T]
+\begin{column}[T]{0.7\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{tools}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Terminology}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.0em}
+\item Vocabulary: 50257 embeddings
+\item Dataset: 9799991296 FineWeb tokens, our training data
+\item Sample: a sequence of 1024 tokens from the dataset
+\item Microbatch: 32 samples
+\item Minibatch (also called a batch): 16 microbatches, gradient accumulation performed afterwards
+\item Step: the process for training on one minibatch
+\item Epoch: one training sweep of the entire dataset, 18692 steps
+\end{enumerate}
+\vspace{0.3cm}
+$
+\qquad \qquad 18692 \times 16 \times 32 \times 1024 = 9799991296
+$
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Distributed training}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Training on $n$ nodes, each with $m$ GPUs
+\item Total $n \times m$ GPUs
+\item World size: $w = m \times n$
+\item Global rank $r_G$ is a unique index $r_G \in \{ 0, \ldots, w - 1 \}$
+\item Local rank $r_L$ is unique per device $r_L \in \{ 0, \ldots, m - 1 \}$
+\item No node index, but we do have {\it hostnames}, \eg\/ {\tt bask-pg0309u05a}, {\tt bask-pg0309u06a}
+\item We may also have multiple CPU {\it workers\/} for each node
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Training with 1 GPU}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{cadence-1gpu}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Training with 2 GPUs}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{cadence-2gpu}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Training with 4 GPUs}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{cadence-4gpu}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{GPT2 nano}
+
+\begin{columns}[T]
+\begin{column}[T]{0.6\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{1.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Time to look at the code
+\item Open your JupyterLab page
+\item Connect to Jupyter
+\item Open the {\tt train\_gpt2.py} file
+\end{enumerate}
+
+\end{column}
+\begin{column}[T]{0.3\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{connect-to-jupyter}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{traingpt2py}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{GPT2 nano classes and functions}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.0em}
+\item {\tt CausalSelfAttention}, {\tt MLP}, {\tt Block}: model components
+\item {\tt GPTConfig}: model configuration
+\item {\tt GPT}: the model
+\item {\tt generate()}: inference
+\item {\tt configure\_optimizers()}: training configuration
+\item {\tt training\_step()}: one training step
+\item {\tt load\_tokens()}: load a single FineWeb shard
+\item {\tt get\_shards()}: find the FineWeb shards on disk
+\item {\tt DataIterator}: our dataset and data loader
+\item {\tt get\_lr()}: calculate the learning rate
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{GPT2 nano execution}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Set hyperparameters
+\item Create model
+\item Perform training loop
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Training time!}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Right click on the {\tt train\_gpt2.py} tab
+\item Select {\bf New View for Python File}
+\item Open a {\bf GPU Resources} pane from the GPU Dashboard
+\item Drag the pane to the tab space on the right
+\item Open a terminal in the left tab space
+\item {\tt source activate.sh}
+\item {\tt python train\_gpt2.py}
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{execute01}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{execute02}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Upgrade to DDP}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Open {\tt train\_gpt2.py} in the left hand tab space
+\item Open {\tt diff\_ddp.ipynb} in the right hand tab space
+\item Execute the first cell of {\tt diff\_ddp.ipynb}
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{diff01}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Understanding unified diffs}
+
+\begin{columns}[T]
+\begin{column}[T]{0.6\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.5cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item \textcolor{teal}{\tt @@} prefix indicates line numbers \\\textcolor{teal}{\tt @@ -before,len +after,len @@}
+\item \textcolor{green}{\tt +} prefix in \textcolor{green}{green} indicates lines added
+\item \textcolor{red}{\tt -} prefix in \textcolor{red}{red} indicates lines removed
+\item Replay the cell to update the diff after making changes
+\end{enumerate}
+
+\end{column}
+\begin{column}[T]{0.3\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\includegraphics[width=1.0\textwidth]{diff02}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Manually apply the diff -- part I}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.0em}
+\item Imports
+\item One process per GPU
+\item We {\it generate\/} on every process
+\item One {\tt DataIterator} per GPU
+\item We must shard the data appropriately
+\item Initialise the process group
+\item Harvest {\bf world size}, {\bf rank} and {\bf local rank} from the environment
+\item Where do these come from?
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Manually apply the diff -- part II}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.0em}
+\setcounter{enumi}{8}
+\item Fix the gradient accumulation steps
+\item Batch sizes must align
+\item Create a {\tt DDP} model
+\item Use the right model variable at the right time
+\item Trigger backward gradient sync
+\item Perform all reduce
+\item Destroy the process group
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Observations}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Most of this is boilerplate
+\item The hardest part is sharding the data correctly
+\item Because this is {\it data parallel}
+\item MPI is also hard \\ \vspace{0.5em} \qquad \qquad \ldots but it's done for us by {\tt torch.distributed} and {\tt DDP}
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Training time!}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item See {\tt batch-ddp-1n1g.sh} for single GPU
+\item See {\tt batch-ddp-2n3g.sh} for dual-node dual GPU
+\end{enumerate}
+
+\begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
+# Single GPU
+python -m torch.distributed.launch \
+    --standalone --nproc_per_node=1 \
+    train_gpt2_ddp.py
+
+# Multi-node
+python -m torch.distributed.launch \
+    --nproc_per_node=${SLURM_GPUS_PER_NODE} \
+    --nnodes=${SLURM_NNODES} \
+    --master-port=${MASTER_PORT} --master-addr=${MASTER_ADDR} \
+    train_gpt2_ddp.py
+\end{lstlisting}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Upgrade to Lightning}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Lightning is conceptually different
+\item Code is organised in {\tt LightningModule}: init, train step, validation step, test step, optimisers
+\item Code outside {\tt LightningModule} is automated by {\tt Trainer}
+\item Remove code moving data to the GPU
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Upgrade to Lightning}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Open {\tt train\_gpt2.py} in the left hand tab space
+\item Open {\tt diff\_lit.ipynb} in the right hand tab space
+\item Execute the first cell of {\tt diff\_lit.ipynb}
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Manually apply the diff -- part I}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.0em}
+\item Imports
+\item Switch from {\tt Module} to {\tt LightningModule}
+\item Fix the {\tt generate()} function
+\item Use the built-in {\tt OneCycleLR} learning rate scheduler
+\item Remove CUDA code from {\tt training\_step()}
+\item Generate examples periodically
+\item Initialise {\tt DataIterator} using a {\tt worker\_init\_fn()}
+\item Remove our custom learning rate scheduler code
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Manually apply the diff -- part II}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.0em}
+\setcounter{enumi}{8}
+\item Remove the process group code
+\item Lose our DDP configuration
+\item Simplify the random seeding
+\item Fix the steps: minibatches are now implicit
+\item Use a {\tt DataLoader} to sequence data loading
+\item Remove our training loop
+\item Add the {\tt Trainer} code
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Observations}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item The training code is greatly simplified
+\item Lightning is SLURM-aware
+\item So MPI is even easier
+\item We can now switch to other strategies ({\it in theory})
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Training time!}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item See {\tt batch-lit-2n8g.sh} for dual-node eight GPU
+\item See {\tt batch-lit-jupyter.sh} to queue from Jupyter
+\end{enumerate}
+
+\begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
+# From inside a SLURM batch script
+srun python train_gpt2_lightning.py
+
+# Queue execution from inside JupyterLab
+sbatch batch-lit-jupyter.sh
+\end{lstlisting}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Scaling across nodes on A100 (40 GiB) GPUs}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-1.5cm}
+\includegraphics[width=1.0\textwidth]{scaling-a100}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Scaling across nodes on MX1550 (128 GiB) GPUs}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-1.5cm}
+\includegraphics[width=1.0\textwidth]{scaling-mx1550}
+
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Wrapping up}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{0.0cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Converting code for distributed training is doable
+\item Review and try out the batch scripts
+\item More examples in the {\tt hpc-landscaptes} repository
+\end{enumerate}
+
+\vspace{0.5cm}
+\qquad \url{https://github.com/alan-turing-institute/hpc-landscape}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
