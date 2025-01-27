@@ -9,19 +9,26 @@ MPI Session Part II: Converting GPT2 to use MPI and Lightning
 
 ## Details
 
-This folder contains material for the MPI session of the Baskerville-Turing Training.
+This folder contains the slides for the MPI session of the Baskerville-Turing Training.
 
-See the [main training repository](https://github.com/baskerville-hpc/2025-01-29-Turing-training) for the full details.
+## Building the slides as PDF
 
-## Schedule
+Requirements:
 
-Session: 2025-01-30, 14:00 - 15:00
+1. Beamer packages
+2. pdflatex
 
-60 minutes session
+Build the PDF output using the included makefile:
+```
+make
+```
 
-## Slides
+The final output can be found as `practical-mpi.pdf`.
 
-The slide source can be found in the `slides` directory.
+To clean out the intermediary build files and output files:
+```
+make clean
+```
 
 ## Licence
 

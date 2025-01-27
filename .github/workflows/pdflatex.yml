@@ -16,9 +16,10 @@ jobs:
         with:
           scheme: full
           run: |
-            pushd .
+            pushd slides
             make
             popd
+            mv slides/practical-mpi.pdf ./practical-mpi.pdf
       - name: Commit to orphan branch
         run: |
           git checkout --orphan gh-action-result/pdf-output
