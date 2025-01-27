@@ -1,0 +1,63 @@
+\PassOptionsToPackage{table}{xcolor}
+
+\documentclass[
+%	handout,
+	notes=none,
+	aspectratio=169
+]{beamer}
+
+% Comment out the following line to hide the notes
+%\setbeameroption{show notes}
+
+\input{macros}
+
+\usefolder{theme}
+\usetheme{TuringDark}
+
+\begin{document}
+
+\title{MPI Part II: Practical MPI}
+\subtitle{Converting GPT2 to use MPI and Lightning}
+\author{Baskerville Training 2025\\29-30 January 2025 -- David Llewellyn-Jones}
+%\date{3rd February 2024}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+
+\frame{
+\titlepage
+}
+\note{
+}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Message Passing Interface}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-0.5cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item MPI: Message Passing Interface
+\item Provides a standard for {\it disstributed memory parallelisation}
+\item Gavin already explained the theory and practice
+\item Now let's apply it to some machine learning
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
