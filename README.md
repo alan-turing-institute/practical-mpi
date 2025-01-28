@@ -23,6 +23,10 @@ Session: 2025-01-30, 14:00 - 15:00
 
 The slide source can be found in the `slides` directory.
 
+## Code
+
+The example code for use during the session can be found in the `code` directory.
+
 ## Licence
 
 BSD 2-clause; see the LICENSE file.
