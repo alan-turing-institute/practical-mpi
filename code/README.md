@@ -18,6 +18,7 @@ Here's a brief explanation of the files and folders contained here:
 | `batchfiles`              | SLURM batch files for running the example code              |
 | `example-logs`            | Examples log files from previous runs                       |
 | `fineweb`                 | Scripts for processing the FineWeb dataset                  |
+| `solutions`               | Don't look in here!                                         |
 
 Note that not all of these files may exist in the version you're provided with.
 That's intentional.
