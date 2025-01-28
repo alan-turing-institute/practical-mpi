@@ -206,7 +206,7 @@ def load_tokens(filename):
     return ptt
 
 def get_shards(split):
-    data_root = "edu_fineweb10B"
+    data_root = "/bask/projects/v/vjgo8416-training25/edu_fineweb10B"
     shards = os.listdir(data_root)
     shards = [s for s in shards if split in s]
     shards = sorted(shards)

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --qos turing
-#SBATCH --account vjgo8416-karpathy
+#SBATCH --account vjgo8416-training25
 #SBATCH --time 0:10:0
 #SBATCH --nodes 1
 #SBATCH --gpus-per-node 2
@@ -17,7 +17,7 @@ module -p load baskerville
 module -p load bask-apps/live
 module -p load PyTorch/2.1.2-foss-2022b-CUDA-11.8.0
 
-cd /bask/projects/v/vjgo8416-karpathy/${USER}/minGPT/gpt-2-video
+cd /bask/projects/v/vjgo8416-training25/${USER}/practical-mpi
 
 python3 -m venv venv
 source ./venv/bin/activate
@@ -36,7 +36,7 @@ echo
 stdbuf -o0 nvidia-smi dmon -o TD -s puct -d 1 > gpu-${SLURM_JOB_ID}.txt &
 
 # Execute the training
-python -m torch.distributed.launch --standalone --nproc_per_node=${SLURM_GPUS_PER_NODE} train_gpt2_ddp.py
+python -m torch.distributed.launch --standalone --nproc_per_node=${SLURM_GPUS_PER_NODE} train_gpt2.py
 
 echo
 echo "######################################"

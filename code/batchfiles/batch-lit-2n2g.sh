@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --qos turing
-#SBATCH --account vjgo8416-ml-workload
-#SBATCH --time 10:00:0
+#SBATCH --account vjgo8416-training25
+#SBATCH --time 0:10:0
 #SBATCH --nodes 2
 #SBATCH --gpus-per-node 1
 #SBATCH --ntasks-per-node 1
@@ -18,7 +18,7 @@ module -q load baskerville
 module -q load bask-apps/live
 module -q load PyTorch/2.1.2-foss-2022b-CUDA-11.8.0
 
-cd /bask/projects/v/vjgo8416-karpathy/${USER}/minGPT/gpt-2-video
+cd /bask/projects/v/vjgo8416-training25/${USER}/practical-mpi
 
 python3 -m venv venv
 source ./venv/bin/activate
@@ -37,7 +37,7 @@ echo
 mpirun -host ${SLURM_JOB_NODELIST} bash -c 'stdbuf -o0 nvidia-smi dmon -o TD -s puct -d 1 > gpu-${SLURM_JOB_ID}-${OMPI_COMM_WORLD_RANK}.txt' &
 
 # Execute the training
-srun python train_gpt2_lightning.py
+srun python train_gpt2.py
 
 echo
 echo "######################################"

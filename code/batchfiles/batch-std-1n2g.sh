@@ -1,23 +1,23 @@
 #!/bin/bash
 #SBATCH --qos turing
-#SBATCH --account vjgo8416-karpathy
+#SBATCH --account vjgo8416-training25
 #SBATCH --time 0:10:0
 #SBATCH --nodes 1
 #SBATCH --gpus-per-node 2
-#SBATCH --cpus-per-gpu 18
+#SBATCH --cpus-per-gpu 9
 #SBATCH --mem 16384
-#SBATCH --job-name gpt2-1n2g
-#SBATCH --output gpt2-1n2g-%j.out
+#SBATCH --job-name gpt2-std-1n2g
+#SBATCH --output gpt2-std-1n2g-%j.out
 
 # Execute using:
-# sbatch batch-1n2g.sh
+# sbatch batch-std-1n2g.sh
 
 module -p purge
 module -p load baskerville
 module -p load bask-apps/live
 module -p load PyTorch/2.1.2-foss-2022b-CUDA-11.8.0
 
-cd /bask/projects/v/vjgo8416-karpathy/${USER}/minGPT/gpt-2-video
+cd /bask/projects/v/vjgo8416-training25/${USER}/practical-mpi
 
 python3 -m venv venv
 source ./venv/bin/activate
