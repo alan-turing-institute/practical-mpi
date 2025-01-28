@@ -1,0 +1,6 @@
+transformers
+torch
+matplotlib
+tiktoken
+datasets
+lightning

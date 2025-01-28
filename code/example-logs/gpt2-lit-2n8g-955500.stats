@@ -1,0 +1,17 @@
++--------------------------------------------------------------------------+
+| Job on the Baskerville cluster:
+| Starting at Tue Jan 28 04:50:07 2025 for ovau2564(102319)
+| Identity jobid 955500 jobname gpt2-lit-2n8g
+| Running against project vjgo8416-ml-workload and in partition baskerville-a100_40
+| Requested cpu=72,mem=32G,node=2,billing=72,gres/gpu=8 - 10:00:00 walltime
+| Allocated cpu=72,mem=32G,node=2,billing=72,gres/gpu=8
+| Assigned to nodes bask-pg0308u06a,bask-pg0309u11a
+| Command /bask/projects/v/vjgo8416-karpathy/ovau2564/minGPT/gpt-2-video/batch-lit-2n8g.sh
+| WorkDir /bask/projects/v/vjgo8416-karpathy/ovau2564/minGPT/gpt-2-video
++--------------------------------------------------------------------------+
++--------------------------------------------------------------------------+
+| Finished at Tue Jan 28 05:04:00 2025 for ovau2564(102319) on the Baskerville Cluster
+| Required (00:25.111 cputime, 58896K memory used) - 00:13:53 walltime
+| JobState COMPLETING - Reason NodeDown
+| Exitcode 0:15
++--------------------------------------------------------------------------+
