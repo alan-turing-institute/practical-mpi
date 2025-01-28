@@ -17,7 +17,7 @@ module -p load baskerville
 module -p load bask-apps/live
 module -p load PyTorch/2.1.2-foss-2022b-CUDA-11.8.0
 
-cd /bask/projects/v/vjgo8416-training25/${USER}/practical-mpi
+cd /bask/projects/v/vjgo8416-training25/${USER}/practical-mpi/code
 
 python3 -m venv venv
 source ./venv/bin/activate
