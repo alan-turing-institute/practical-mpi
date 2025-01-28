@@ -11,6 +11,8 @@ MPI Session Part II: Converting GPT2 to use MPI and Lightning
 
 This folder contains material for the MPI session of the Baskerville-Turing Training.
 
+The original repository is at [https://github.com/alan-turing-institute/practical-mpi.git](https://github.com/alan-turing-institute/practical-mpi.git)
+
 See the [main training repository](https://github.com/baskerville-hpc/2025-01-29-Turing-training) for the full details.
 
 ## Schedule
