@@ -469,19 +469,19 @@ $
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}
-\frametitle{GPT2 nano}
+\begin{frame}[fragile]
+\frametitle{Time to look at the code}
 
 \begin{columns}[T]
 \begin{column}[T]{0.6\textwidth}
 \setlength{\parskip}{0.5em}
 
-\vspace{1.0cm}
+\vspace{0.0cm}
 \begin{enumerate}
 \setlength{\parskip}{0.5em}
-\item Time to look at the code
 \item Open your JupyterLab page
 \item Connect to Jupyter
+\item Clone the repository
 \item Open the {\tt train\_gpt2.py} file
 \end{enumerate}
 
@@ -489,11 +489,21 @@ $
 \begin{column}[T]{0.3\textwidth}
 \setlength{\parskip}{0.5em}
 
-\vspace{0.0cm}
+\vspace{-0.5cm}
 \includegraphics[width=1.0\textwidth]{connect-to-jupyter}
 
 \end{column}
 \end{columns}
+
+\begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
+# Move into your user directory
+cd /bask/projects/v/vjgo8416-training25/$USER/
+
+# Clone the repository
+git clone \
+    https://github.com/alan-turing-institute/practical-mpi.git
+\end{lstlisting}
+
 
 \end{frame}
 \note{
@@ -821,14 +831,14 @@ $
 # Single GPU
 python -m torch.distributed.launch \
     --standalone --nproc_per_node=1 \
-    train_gpt2_ddp.py
+    train_gpt2.py
 
 # Multi-node
 python -m torch.distributed.launch \
     --nproc_per_node=${SLURM_GPUS_PER_NODE} \
     --nnodes=${SLURM_NNODES} \
     --master-port=${MASTER_PORT} --master-addr=${MASTER_ADDR} \
-    train_gpt2_ddp.py
+    train_gpt2.py
 \end{lstlisting}
 
 \end{column}
@@ -987,7 +997,7 @@ python -m torch.distributed.launch \
 
 \begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
 # From inside a SLURM batch script
-srun python train_gpt2_lightning.py
+srun python train_gpt2.py
 
 # Queue execution from inside JupyterLab
 sbatch batch-lit-jupyter.sh
