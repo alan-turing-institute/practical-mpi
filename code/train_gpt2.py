@@ -1,9 +1,9 @@
 #!python3
 # vim: et:ts=4:sts=4:sw=4
 
-from torch.distributed import init_process_group, destroy_process_group
-from torch.nn.parallel import DistributedDataParallel as DDP
-import torch.distributed as dist
+import lightning as L
+from torch.utils.data import IterableDataset, Dataset, DataLoader
+from lightning import Trainer
 
 from dataclasses import dataclass
 import torch
@@ -97,7 +97,7 @@ class GPTConfig:
     # Embedding dimension
     n_embd: int = 768
 
-class GPT(nn.Module):
+class GPT(L.LightningModule):
 
     def __init__(self, config):
         super().__init__()
@@ -155,8 +155,8 @@ class GPT(nn.Module):
         tokens = enc.encode("Hello, I'm a language model,")
         tokens = torch.tensor(tokens, dtype=torch.long)
         tokens = tokens.unsqueeze(0).repeat(num_return_sequences, 1)
-        xgen = tokens.to(device)
-        sample_rng = torch.Generator(device=device)
+        xgen = self.transfer_batch_to_device(tokens, self.device, 0)
+        sample_rng = torch.Generator(device=self.device)
         sample_rng.manual_seed(42 + rank)
         while xgen.size(1) < max_length:
             with torch.no_grad():
@@ -185,15 +185,19 @@ class GPT(nn.Module):
         use_fused = "fused" in inspect.signature(torch.optim.AdamW).parameters
         # AdamW docs: https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html#torch.optim.AdamW
         optimizer = torch.optim.AdamW(optim_groups, lr=max_lr, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
-        return optimizer
+        # OneCycleLR docs: https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.OneCycleLR.html
+        lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=max_lr, epochs=1, steps_per_epoch=max_steps, pct_start=(warmup_steps / max_steps), anneal_strategy="cos", cycle_momentum=True, base_momentum=0.0, max_momentum=0.0, div_factor=warmup_steps, final_div_factor=(max_lr / min_lr))
+        return { "optimizer": optimizer, "lr_scheduler": {"scheduler": lr_scheduler, "interval": "step", "frequency": 1}}
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        x, y = x.to(device), y.to(device)
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-            logits, loss = self(x, y)
+        logits, loss = self(x, y)
         loss = loss / grad_accum_steps
         return loss
+
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+        if batch_idx % (200 * world_size) == 0:
+            self.generate(self.trainer.global_rank)
 
 def load_tokens(filename):
     npt = np.load(filename)
@@ -209,7 +213,12 @@ def get_shards(split):
     shards = [os.path.join(data_root, s) for s in shards]
     return shards
 
-class DataIterator:
+def worker_init_fn(worker_id):
+    worker_info = torch.utils.data.get_worker_info()
+    global_id = (torch.distributed.get_rank() * torch.distributed.get_world_size()) + worker_info.id
+    worker_info.dataset.reset(global_id)
+
+class DataIterator(IterableDataset):
 
     def __init__(self, B, T, num_processes, process_rank):
         self.B = B
@@ -247,76 +256,39 @@ class DataIterator:
                 self.current_position = B * T * self.process_rank
             yield x, y
 
-def get_lr(it):
-    if it < warmup_steps:
-        return max_lr * (it + 1) / warmup_steps
-    if it > max_steps:
-        return min_lr
-    decay_ratio = (it - warmup_steps) / (max_steps - warmup_steps)
-    assert 0 <= decay_ratio <= 1
-    coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
-    return min_lr + coeff * (max_lr - min_lr)
+nnodes = int(os.environ.get("SLURM_NNODES", 1))
+world_size = nnodes * torch.cuda.device_count()
 
-init_process_group(backend="nccl")
-ddp_rank = int(os.environ["RANK"])
-ddp_local_rank = int(os.environ["LOCAL_RANK"])
-world_size = int(os.environ["WORLD_SIZE"])
-device = f"cuda:{ddp_local_rank}"
-torch.cuda.set_device(device)
-
-torch.manual_seed(1337)
-torch.cuda.manual_seed(1337)
+L.pytorch.seed_everything(1337, workers=True)
 
 enc = tiktoken.get_encoding("gpt2")
 
 total_tokens = 9799991296
 minibatch_size = 524288
-B = 32
+B = 16
 T = 1024
 grad_accum_steps = minibatch_size // (B * T * world_size)
 max_lr = 6e-4
 min_lr = max_lr * 0.1
 warmup_steps = 715
-max_steps = total_tokens // minibatch_size
+max_steps = total_tokens // (B * T * world_size)
 
 assert minibatch_size % (B * T * world_size) == 0, "Make sure minibatch size is divisible by microbatch size"
 
 config = GPTConfig(vocab_size=50304)
-train_dataset = DataIterator(B=B, T=T, num_processes=world_size, process_rank=ddp_rank)
-train_loader = iter(train_dataset)
+train_dataset = DataIterator(B=B, T=T, num_processes=world_size, process_rank=0)
+train_loader = DataLoader(train_dataset, batch_size=None, num_workers=1, worker_init_fn=worker_init_fn)
 
 torch.set_float32_matmul_precision("high")
 
-raw_model = GPT(config)
+model = GPT(config)
 
-raw_model.to(device)
-model = DDP(raw_model, device_ids=[ddp_local_rank])
+trainer = Trainer(
+    max_epochs=1,
+    gradient_clip_val=1.0,
+    num_nodes=nnodes,
+    accelerator="gpu",
+    strategy="ddp",
+)
+trainer.fit(model, train_loader)
 
-optimizer = raw_model.configure_optimizers()
-
-for step in range(max_steps):
-    if step % 25 == 0:
-        model.eval()
-        raw_model.generate(ddp_rank)
-
-    model.train()
-    optimizer.zero_grad()
-    loss_accum = 0.0
-    for micro_step in range(grad_accum_steps):
-        batch = next(train_loader)
-        raw_model.require_backward_grad_sync = (micro_step == (grad_accum_steps - 1))
-        loss = raw_model.training_step(batch, (step * grad_accum_steps) + micro_step)
-        loss_accum += loss.detach()
-        loss.backward()
-    norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-    dist.all_reduce(loss_accum, op=dist.ReduceOp.AVG)
-    lr = get_lr(step)
-    for param_group in optimizer.param_groups:
-        param_group["lr"] = lr
-    optimizer.step()
-    torch.cuda.synchronize()
-    print(f"| step {step:4d}/{max_steps} | loss {loss_accum.item():0.6f} | lr: {lr:0.4e} | norm: {norm:0.4f} |")
-
-model.eval()
-
-destroy_process_group()
