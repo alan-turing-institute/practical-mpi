@@ -1,7 +1,13 @@
-# Practical MPI - Baskerville-Turing Training
+# Multi-node training with Lightning
 
 [![LaTeX build](../../actions/workflows/pdflatex.yml/badge.svg)](../../actions/workflows/pdflatex.yml)
 [![Slides](https://img.shields.io/badge/PDF-Slides-orange.svg?style=flat)](../gh-action-result/pdf-output/practical-mpi.pdf)
+
+David Llewellyn-Jones
+
+| Time | Session |
+|------|---------|
+| 14:00 - 15:00 | Multi-node training with Lightning |
 
 2025-01-30
 
@@ -17,7 +23,7 @@ See the [main training repository](https://github.com/baskerville-hpc/2025-01-29
 
 ## Schedule
 
-Session: 2025-01-30, 14:00 - 15:00
+Session: 2025-11-25, 14:00 - 15:00
 
 60 minutes session
 
