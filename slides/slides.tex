@@ -16,9 +16,9 @@
 
 \begin{document}
 
-\title{MPI Part II: Practical MPI}
+\title{Tutorial 3: Multi-node training with Lightning}
 \subtitle{Converting GPT2 to use MPI and Lightning}
-\author{Baskerville Training 2025\\29-30 January 2025 -- David Llewellyn-Jones}
+\author{Baskerville Training\\25-26 November 2025 -- David Llewellyn-Jones}
 %\date{30 January 2025}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,7 +68,7 @@
 \setlength{\parskip}{0.5em}
 
 \vspace{-0.5cm}
-GPUs are great for accelerated training and inference, but processing is bound by:
+GPUs are great for accelerated training and inference, but processing is bounded by:
 \begin{enumerate}
 \setlength{\parskip}{0.5em}
 \item Available memory
@@ -130,7 +130,15 @@ The last two require {\it more compute}
 \item Select \href{https://portal.baskerville.ac.uk/}{Baserville Portal}
 \item Login if necessary
 \item Select \href{https://portal.baskerville.ac.uk/pun/sys/dashboard/batch_connect/sys/bc_bask_jupyter/session_contexts/new}{JupyterLab} from the Interactive Apps list
-\item Configure a 2 hour session with 1 GPU on the project {\tt vjgo8416-training25} and the {\tt turing} queue
+\item Configure the session:
+  \begin{enumerate}
+  \item Kernel to load: {\tt Python 3.11.3 (2023a / GCCcore-12.3.0)}
+  \item Show Conda Environment: Unselected
+  \item Number of hours: 2
+  \item Number of GPUs: 1
+  \item Baskerville project {\tt vjgo8416-hpc2511}
+  \item Queue: {\tt turing}
+  \nd{enumerate}
 \item Launch
 \end{enumerate}
 
@@ -481,8 +489,9 @@ $
 \setlength{\parskip}{0.5em}
 \item Open your JupyterLab page
 \item Connect to Jupyter
-\item Clone the repository
-\item Open the {\tt train\_gpt2.py} file
+\item Select the File Browser in the vertical bar on the left
+\item Move to the directory: {\tt ~/vjgo8416-hpc2511/$USER/hpc-training-nov-2025/3-Training/code}
+\item Open the {\tt train\_gpt2.py} file by double-clicking on it
 \end{enumerate}
 
 \end{column}
@@ -494,16 +503,6 @@ $
 
 \end{column}
 \end{columns}
-
-\begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
-# Move into your user directory
-cd /bask/projects/v/vjgo8416-training25/$USER/
-
-# Clone the repository
-git clone \
-    https://github.com/alan-turing-institute/practical-mpi.git
-\end{lstlisting}
-
 
 \end{frame}
 \note{
@@ -1064,7 +1063,7 @@ sbatch batch-lit-jupyter.sh
 \setlength{\parskip}{0.5em}
 \item Converting code for distributed training is doable
 \item Review and try out the batch scripts
-\item More examples in the {\tt hpc-landscaptes} repository
+\item More examples in the {\tt hpc-landscapes} repository
 \end{enumerate}
 
 \vspace{0.5cm}
