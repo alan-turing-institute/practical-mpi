@@ -18,7 +18,7 @@
 
 \title{Tutorial 3: Multi-node training with Lightning}
 \subtitle{Converting GPT2 to use MPI and Lightning}
-\author{Baskerville Training\\25-26 November 2025 -- David Llewellyn-Jones}
+\author{HPC Training -- 25-26 November 2025 \\David Llewellyn-Jones}
 %\date{30 January 2025}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,29 +120,37 @@ The last two require {\it more compute}
 \frametitle{Preparation}
 
 \begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
+\begin{column}[T]{0.52\textwidth}
 \setlength{\parskip}{0.5em}
 
 \vspace{0.0cm}
 \begin{enumerate}
 \setlength{\parskip}{0.5em}
-\item Open \url{https://docs.baskerville.ac.uk/}
+\item Open Baskerville docs\\\url{https://docs.baskerville.ac.uk}
 \item Select \href{https://portal.baskerville.ac.uk/}{Baserville Portal}
 \item Login if necessary
-\item Select \href{https://portal.baskerville.ac.uk/pun/sys/dashboard/batch_connect/sys/bc_bask_jupyter/session_contexts/new}{JupyterLab} from the Interactive Apps list
-\item Configure the session:
-  \begin{enumerate}
-  \item Kernel to load: {\tt Python 3.11.3 (2023a / GCCcore-12.3.0)}
-  \item Show Conda Environment: Unselected
-  \item Number of hours: 2
-  \item Number of GPUs: 1
-  \item Baskerville project {\tt vjgo8416-hpc2511}
-  \item Queue: {\tt turing}
-  \nd{enumerate}
+\item Select \href{https://portal.baskerville.ac.uk/pun/sys/dashboard/batch_connect/sys/bc_bask_jupyter/session_contexts/new}{JupyterLab} Apps list
+\item Configure the session
 \item Launch
 \end{enumerate}
-
 \end{column}
+
+\begin{column}[T]{0.48\textwidth}
+\vspace{-0.1cm}
+\begin{tcolorbox}[colback=slidebg,colframe=cyan!50!black,title=Session configuration]
+\small
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
+\item Kernel: {\tt Python 3.11.3}
+\item Show Conda Envs: {\tt No}
+\item Number of hours: {\tt 2}
+\item Number of GPUs: {\tt 1}
+\item Project: {\tt vjgo8416-hpc2511}
+\item Queue: {\tt turing}
+\end{enumerate}
+\end{tcolorbox}
+\end{column}
+
 \end{columns}
 
 \end{frame}
@@ -490,7 +498,7 @@ $
 \item Open your JupyterLab page
 \item Connect to Jupyter
 \item Select the File Browser in the vertical bar on the left
-\item Move to the directory: {\tt ~/vjgo8416-hpc2511/$USER/hpc-training-nov-2025/3-Training/code}
+\item Move to the directory: {\tt ~/vjgo8416-hpc2511/\$USER/hpc-training-nov-2025/3-Training/code}
 \item Open the {\tt train\_gpt2.py} file by double-clicking on it
 \end{enumerate}
 
