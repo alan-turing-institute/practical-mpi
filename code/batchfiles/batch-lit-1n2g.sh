@@ -16,6 +16,9 @@
 # Errors stop execution
 set -e
 
+# Errors stop execution
+set -e
+
 module -q purge
 module -q load baskerville
 module -q load bask-apps/live
