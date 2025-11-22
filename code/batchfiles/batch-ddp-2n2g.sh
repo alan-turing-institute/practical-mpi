@@ -1,32 +1,38 @@
 #!/bin/bash
 #SBATCH --qos turing
-#SBATCH --account vjgo8416-training25
+#SBATCH --account vjgo8416-hpc2511
 #SBATCH --time 0:10:0
 #SBATCH --nodes 2
-#SBATCH --gpus-per-node 1
-#SBATCH --cpus-per-gpu 9
-#SBATCH --mem 16384
+#SBATCH --gpus-per-node 2
+#SBATCH --ntasks-per-node 1
+#SBATCH --cpus-per-task 16
+#SBATCH --mem-per-gpu 16384
 #SBATCH --job-name gpt2-ddp-2n2g
 #SBATCH --output gpt2-ddp-2n2g-%j.out
 
 # Execute using:
 # sbatch batch-ddp-1n2g.sh
 
+# Errors stop execution
+set -e
+
 module -q purge
 module -q load baskerville
 module -q load bask-apps/live
-module -q load PyTorch/2.1.2-foss-2022b-CUDA-11.8.0
+module -q load PyTorch/2.1.2-foss-2023a-CUDA-12.1.1
 
-cd /bask/projects/v/vjgo8416-training25/${USER}/practical-mpi/code
+cd /bask/projects/v/vjgo8416-hpc2511/${USER}/hpc-training-nov-2025/3-Training/code
 
-python3 -m venv venv
+python3 -m venv --system-site-packages venv
 source ./venv/bin/activate
 pip -q install pip --upgrade
 pip -q install -r requirements.txt
 
-export OMP_NUM_THREADS=${SLURM_CPUS_PER_GPU}
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export MASTER_ADDR=$(scontrol show hostnames "${SLURM_JOB_NODELIST}" | head -n 1)
 export MASTER_PORT=$((1024 + $RANDOM % 64511))
+unset SLURM_MEM_PER_CPU
+unset SLURM_TRES_PER_TASK
 
 echo
 echo "######################################"
@@ -34,11 +40,23 @@ echo "Starting:" ${SLURM_JOB_NAME}
 echo "######################################"
 echo
 
+echo "MASTER_ADDR: ${MASTER_ADDR}"
+echo "SLURM_NNODES: ${SLURM_NNODES}"
+echo "SLURM_GPUS_PER_NODE: ${SLURM_GPUS_PER_NODE}"
+
 # Track GPU metrics
-mpirun -host ${SLURM_JOB_NODELIST} bash -c 'stdbuf -o0 nvidia-smi dmon -o TD -s puct -d 1 > gpu-${SLURM_JOB_ID}-${OMPI_COMM_WORLD_RANK}.txt' &
+mpirun -host ${SLURM_JOB_NODELIST} bash -c 'stdbuf -o0 \
+    nvidia-smi dmon -o TD -s puct -d 1 \
+    > gpu-${SLURM_JOB_ID}-${OMPI_COMM_WORLD_RANK}.txt' &
 
 # Execute the training
-python -m torch.distributed.launch --nproc_per_node=${SLURM_GPUS_PER_NODE} --nnodes=${SLURM_NNODES} --master-port=${MASTER_PORT} --master-addr=${MASTER_ADDR} train_gpt2.py
+srun bash -c 'python -m torch.distributed.launch \
+    --nproc_per_node=${SLURM_GPUS_PER_NODE} \
+    --nnodes=${SLURM_NNODES} \
+    --master-port=${MASTER_PORT} \
+    --master-addr=${MASTER_ADDR} \
+    --node_rank=$SLURM_PROCID \
+    train_gpt2.py'
 
 echo
 echo "######################################"

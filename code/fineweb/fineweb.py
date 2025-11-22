@@ -1,3 +1,9 @@
+#!python3
+# vim: et:ts=4:sts=4:sw=4
+
+# SPDX-License-Identifier: MIT
+# Copyright © 2025 The Alan Turing Institute
+
 import os
 import multiprocessing as mp
 import numpy as np
@@ -27,9 +33,9 @@ def tokenize(doc):
     return tokens_np_uint16
 
 def write_datafile(filename, tokens_np):
-    print("Writing datafile: {filename}")
+    print(f"Writing datafile: {filename}")
     np.save(filename, tokens_np)
-    print("File written: {filename}")
+    print(f"File written: {filename}")
 
 nprocs = max(1, os.cpu_count() // 2)
 with mp.Pool(nprocs) as pool:

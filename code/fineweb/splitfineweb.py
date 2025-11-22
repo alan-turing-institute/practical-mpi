@@ -2,7 +2,7 @@
 # vim: et:ts=4:sts=4:sw=4
 
 # SPDX-License-Identifier: MIT
-# Copyright © 2024 David Llewellyn-Jones
+# Copyright © 2025 The Alan Turing Institute
 
 import os
 import torch

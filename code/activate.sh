@@ -10,10 +10,10 @@ echo "Loading modules"
 module -q purge
 module -q load baskerville
 module -q load bask-apps/live
-module -q load PyTorch/2.1.2-foss-2022b-CUDA-11.8.0
+module -q load PyTorch/2.1.2-foss-2023a-CUDA-12.1.1
 
 echo "Activating venv"
-python3 -m venv venv
+python3 -m venv --system-site-packages venv
 source ./venv/bin/activate
 pip -q install pip --upgrade
 pip -q install -r requirements.txt

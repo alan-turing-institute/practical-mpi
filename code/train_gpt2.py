@@ -198,7 +198,7 @@ def load_tokens(filename):
     return ptt
 
 def get_shards(split):
-    data_root = "/bask/projects/v/vjgo8416-training25/edu_fineweb10B"
+    data_root = "/bask/projects/v/vjgo8416-hpc2511/edu_fineweb10B"
     shards = os.listdir(data_root)
     shards = [s for s in shards if split in s]
     shards = sorted(shards)
@@ -301,7 +301,7 @@ for step in range(max_steps):
         param_group["lr"] = lr
     optimizer.step()
     torch.cuda.synchronize()
-    print(f"| step {step:4d}/{max_steps} | loss {loss_accum.item():0.6f} | lr: {lr:0.4e} | norm: {norm:0.4f} |")
+    print(f"| step {step:4d}/{max_steps} | loss {loss_accum.item():0.6f} | lr: {lr:0.4e} | norm: {norm:0.4f} |", flush=True)
 
 model.eval()
 
