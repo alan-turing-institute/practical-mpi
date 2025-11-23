@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+from torch.utils.data import IterableDataset, Dataset, DataLoader
 import math
 import tiktoken
 import inspect
@@ -205,7 +206,7 @@ def get_shards(split):
     shards = [os.path.join(data_root, s) for s in shards]
     return shards
 
-class DataIterator:
+class DataIterator(IterableDataset):
 
     def __init__(self, B, T, num_processes, process_rank):
         self.B = B
