@@ -33,30 +33,6 @@
 
 \renewcommand{\thefootnote}{\fnsymbol{footnote}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Message Passing Interface}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{-0.5cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item MPI: Message Passing Interface
-\item Provides a standard for {\it distributed memory parallelisation}
-\item Let's apply it to some machine learning
-\end{enumerate}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
@@ -365,7 +341,7 @@ The last two require {\it more compute}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Terminology}
+\frametitle{Training terminology}
 
 \begin{columns}[T]
 \begin{column}[T]{1.0\textwidth}
@@ -386,34 +362,6 @@ The last two require {\it more compute}
 $
 \qquad \qquad 18692 \times 16 \times 32 \times 1024 = 9799991296
 $
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Distributed training}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{0.0cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item Training on $n$ nodes, each with $m$ GPUs
-\item Total $n \times m$ GPUs
-\item World size: $w = m \times n$
-\item Global rank $r_G$ is a unique index $r_G \in \{ 0, \ldots, w - 1 \}$
-\item Local rank $r_L$ is unique per device $r_L \in \{ 0, \ldots, m - 1 \}$
-\item No node index, but we do have {\it hostnames}, \eg\/ {\tt bask-pg0309u05a}, {\tt bask-pg0309u06a}
-\item We may also have multiple CPU {\it workers\/} for each node
-\end{enumerate}
 
 \end{column}
 \end{columns}
@@ -484,29 +432,56 @@ $
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[fragile]
-\frametitle{Time to look at the code}
+\begin{frame}
+\frametitle{Distributed training terminology}
 
 \begin{columns}[T]
-\begin{column}[T]{0.6\textwidth}
+\begin{column}[T]{1.0\textwidth}
 \setlength{\parskip}{0.5em}
 
 \vspace{0.0cm}
 \begin{enumerate}
 \setlength{\parskip}{0.5em}
+\item Training on $n$ nodes, each with $m$ GPUs
+\item Total $n \times m$ GPUs
+\item World size: $w = m \times n$
+\item Global rank $r_G$ is a unique index $r_G \in \{ 0, \ldots, w - 1 \}$
+\item Local rank $r_L$ is unique per device $r_L \in \{ 0, \ldots, m - 1 \}$
+\item No node index, but we do have {\it hostnames}, \eg\/ {\tt bask-pg0309u05a}, {\tt bask-pg0309u06a}
+\item We may also have multiple CPU {\it workers\/} for each node
+\end{enumerate}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+\note{
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Time to look at the code}
+
+\begin{columns}[T]
+\begin{column}[T]{1.0\textwidth}
+\setlength{\parskip}{0.5em}
+
+\vspace{-1.5cm}
+\begin{enumerate}
+\setlength{\parskip}{0.5em}
 \item Open your JupyterLab page
 \item Connect to Jupyter
-\item Select the File Browser in the vertical bar on the left
+\item Select the File Browser in the \\vertical bar on the left
 \item Move to the directory: {\tt ~/vjgo8416-hpc2511/\$USER/hpc-training-nov-2025/3-Training/code}
 \item Open the {\tt train\_gpt2.py} file by double-clicking on it
 \end{enumerate}
 
-\end{column}
-\begin{column}[T]{0.3\textwidth}
 \setlength{\parskip}{0.5em}
 
-\vspace{-0.5cm}
-\includegraphics[width=1.0\textwidth]{connect-to-jupyter}
+\vspace{-5.4cm}
+\hfill
+\includegraphics[width=0.45\textwidth]{connect-to-jupyter}
 
 \end{column}
 \end{columns}
