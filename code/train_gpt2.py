@@ -1,6 +1,10 @@
 #!python3
 # vim: et:ts=4:sts=4:sw=4
 
+from torch.distributed import init_process_group, destroy_process_group
+from torch.nn.parallel import DistributedDataParallel as DDP
+import torch.distributed as dist
+
 from dataclasses import dataclass
 import torch
 import torch.nn as nn
@@ -221,10 +225,10 @@ class DataIterator(IterableDataset):
         self.process_rank = process_rank
         self.current_shard = 0
         self.tokens = load_tokens(self.shards[self.current_shard])
-        self.current_position = 0
+        self.current_position = self.B * self.T * self.process_rank
 
     def __len__(self):
-        return total_tokens // (self.B * self.T)
+        return total_tokens // (self.B * self.T * self.num_processes)
 
     def __iter__(self):
         B, T = self.B, self.T
@@ -235,12 +239,12 @@ class DataIterator(IterableDataset):
             # Targets
             y = (buf[1:]).view(B, T)
             # Advance the position in the tensor
-            self.current_position += B * T
+            self.current_position += B * T * self.num_processes
             # If loading the next batch would be out of bounds, advance to next shard
-            if self.current_position + (B * T) + 1 > len(self.tokens):
+            if self.current_position + (B * T * self.num_processes) + 1 > len(self.tokens):
                 self.current_shard = (self.current_shard + 1) % len(self.shards)
                 self.tokens = load_tokens(self.shards[self.current_shard])
-                self.current_position = 0
+                self.current_position = B * T * self.process_rank
             yield x, y
 
 def get_lr(it):
@@ -253,9 +257,12 @@ def get_lr(it):
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
     return min_lr + coeff * (max_lr - min_lr)
 
-ddp_rank = 0
-world_size = 0
-device = "cuda"
+ddp_local_rank = int(os.environ["LOCAL_RANK"])
+ddp_rank = int(os.environ["RANK"])
+world_size = int(os.environ["WORLD_SIZE"])
+device = f"cuda:{ddp_local_rank}"
+torch.cuda.set_device(device)
+init_process_group(backend="nccl")
 
 torch.manual_seed(1337)
 torch.cuda.manual_seed(1337)
@@ -266,7 +273,7 @@ total_tokens = 9799991296
 minibatch_size = 524288
 B = 16
 T = 1024
-grad_accum_steps = minibatch_size // (B * T)
+grad_accum_steps = minibatch_size // (B * T * world_size)
 max_lr = 6e-4
 min_lr = max_lr * 0.1
 warmup_steps = 715
@@ -278,26 +285,29 @@ train_loader = iter(train_dataset)
 
 torch.set_float32_matmul_precision("high")
 
-model = GPT(config)
+raw_model = GPT(config)
 
-model.to(device)
+raw_model.to(device)
+model = DDP(raw_model, device_ids=[ddp_local_rank])
 
-optimizer = model.configure_optimizers()
+optimizer = raw_model.configure_optimizers()
 
 for step in range(max_steps):
     if step % 25 == 0:
         model.eval()
-        model.generate(ddp_rank)
+        raw_model.generate(ddp_rank)
 
     model.train()
     optimizer.zero_grad()
     loss_accum = 0.0
     for micro_step in range(grad_accum_steps):
         batch = next(train_loader)
-        loss = model.training_step(batch, (step * grad_accum_steps) + micro_step)
+        raw_model.require_backward_grad_sync = (micro_step == (grad_accum_steps - 1))
+        loss = raw_model.training_step(batch, (step * grad_accum_steps) + micro_step)
         loss_accum += loss.detach()
         loss.backward()
     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    dist.all_reduce(loss_accum, op=dist.ReduceOp.AVG)
     lr = get_lr(step)
     for param_group in optimizer.param_groups:
         param_group["lr"] = lr
@@ -307,3 +317,4 @@ for step in range(max_steps):
 
 model.eval()
 
+destroy_process_group()
