@@ -19,12 +19,12 @@ jobs:
             pushd slides
             make
             popd
-            mv slides/practical-mpi.pdf ./practical-mpi.pdf
+            mv slides/tutorial-3-training.pdf ./tutorial-3-training.pdf
       - name: Commit to orphan branch
         run: |
           git checkout --orphan gh-action-result/pdf-output
           git rm -rf .
-          git add practical-mpi.pdf
+          git add tutorial-3-training.pdf
           git -c user.name='GitHub Action' -c user.email='action@github.com' commit -m "Built PDF documents"
       - name: Push changes
         uses: ad-m/github-push-action@master
