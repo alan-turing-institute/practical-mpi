@@ -145,7 +145,7 @@ class GPT(nn.Module):
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
         return logits, loss
 
-    def generate(self):
+    def generate(self, rank):
         num_return_sequences = 4
         max_length = 32
         tokens = enc.encode("Hello, I'm a language model,")
@@ -153,7 +153,7 @@ class GPT(nn.Module):
         tokens = tokens.unsqueeze(0).repeat(num_return_sequences, 1)
         xgen = tokens.to(device)
         sample_rng = torch.Generator(device=device)
-        sample_rng.manual_seed(42)
+        sample_rng.manual_seed(42 + rank)
         while xgen.size(1) < max_length:
             with torch.no_grad():
                 with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
@@ -207,15 +207,17 @@ def get_shards(split):
 
 class DataIterator:
 
-    def __init__(self, B, T):
+    def __init__(self, B, T, num_processes, process_rank):
         self.B = B
         self.T = T
+        self.num_processes = num_processes
         self.shards = get_shards("train")
         assert len(self.shards) > 0, f"No shards found"
 
-        self.reset()
+        self.reset(process_rank)
 
-    def reset(self):
+    def reset(self, process_rank):
+        self.process_rank = process_rank
         self.current_shard = 0
         self.tokens = load_tokens(self.shards[self.current_shard])
         self.current_position = 0
@@ -251,6 +253,8 @@ def get_lr(it):
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
     return min_lr + coeff * (max_lr - min_lr)
 
+ddp_rank = 0
+world_size = 0
 device = "cuda"
 
 torch.manual_seed(1337)
@@ -260,7 +264,7 @@ enc = tiktoken.get_encoding("gpt2")
 
 total_tokens = 9799991296
 minibatch_size = 524288
-B = 32
+B = 16
 T = 1024
 grad_accum_steps = minibatch_size // (B * T)
 max_lr = 6e-4
@@ -271,7 +275,7 @@ max_steps = total_tokens // minibatch_size
 assert minibatch_size % (B * T) == 0, "Make sure minibatch size is divisible by microbatch size"
 
 config = GPTConfig(vocab_size=50304)
-train_dataset = DataIterator(B=B, T=T)
+train_dataset = DataIterator(B=B, T=T, num_processes=world_size, process_rank=ddp_rank)
 train_loader = iter(train_dataset)
 
 torch.set_float32_matmul_precision("high")
@@ -285,7 +289,7 @@ optimizer = model.configure_optimizers()
 for step in range(max_steps):
     if step % 25 == 0:
         model.eval()
-        model.generate()
+        model.generate(ddp_rank)
 
     model.train()
     optimizer.zero_grad()
