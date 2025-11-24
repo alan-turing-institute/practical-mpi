@@ -639,7 +639,7 @@ $
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Manually apply the diff -- part I}
+\frametitle{Manually apply the diff}
 
 \begin{columns}[T]
 \begin{column}[T]{1.0\textwidth}
@@ -649,42 +649,14 @@ $
 \begin{enumerate}
 \setlength{\parskip}{0.0em}
 \item Imports
-\item One process per GPU
-\item We {\it generate\/} on every process
-\item One {\tt DataIterator} per GPU
-\item We must shard the data appropriately
-\item Initialise the process group
+\item Wrap the model in the {\tt DDP} class
+\item Initialise the world parameters
+\begin{enumerate}
 \item Harvest {\bf world size}, {\bf rank} and {\bf local rank} from the environment
 \item Where do these come from?
 \end{enumerate}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Manually apply the diff -- part II}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{0.0cm}
-\begin{enumerate}
-\setlength{\parskip}{0.0em}
-\setcounter{enumi}{8}
-\item Fix the gradient accumulation steps
-\item Batch sizes must align
-\item Create a {\tt DDP} model
-\item Use the right model variable at the right time
-\item Trigger backward gradient sync
-\item Perform all reduce
-\item Destroy the process group
+\item Initialise the process group
+\item Add a stride to our data iterator
 \end{enumerate}
 
 \end{column}
@@ -709,7 +681,7 @@ $
 \item Most of this is boilerplate
 \item The hardest part is sharding the data correctly
 \item Because this is {\it data parallel}
-\item MPI is also hard \\ \vspace{0.5em} \qquad \qquad \ldots but it's done for us by {\tt torch.distributed} and {\tt DDP}
+\item Communication between processes is also hard \\ \vspace{0.5em} \qquad \qquad \ldots but done for us by {\tt torch.distributed} and {\tt DDP}
 \end{enumerate}
 
 \end{column}
@@ -729,24 +701,23 @@ $
 \setlength{\parskip}{0.5em}
 
 \vspace{0.0cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item See {\tt batch-ddp-1n1g.sh} for single GPU
-\item See {\tt batch-ddp-2n3g.sh} for dual-node dual GPU
-\end{enumerate}
+See {\tt batch-ddp-1n1g.sh}. {\tt batch-ddp-1n2g.sh} and {\tt batch-ddp-2n2g.sh}
 
 \begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
-# Single GPU
+# Single node
 python -m torch.distributed.launch \
-    --standalone --nproc_per_node=1 \
+    --standalone \
+    --nproc-per-node=${SLURM_GPUS_PER_NODE} \
     train_gpt2.py
 
 # Multi-node
-python -m torch.distributed.launch \
+srun bash -c 'python -m torch.distributed.launch \
     --nproc_per_node=${SLURM_GPUS_PER_NODE} \
     --nnodes=${SLURM_NNODES} \
-    --master-port=${MASTER_PORT} --master-addr=${MASTER_ADDR} \
-    train_gpt2.py
+    --master-port=${MASTER_PORT} \
+    --master-addr=${MASTER_ADDR} \
+    --node_rank=${SLURM_PROCID} \
+    train_gpt2.py'
 \end{lstlisting}
 
 \end{column}
@@ -807,7 +778,7 @@ python -m torch.distributed.launch \
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Manually apply the diff -- part I}
+\frametitle{Manually apply the diff}
 
 \begin{columns}[T]
 \begin{column}[T]{1.0\textwidth}
@@ -818,41 +789,13 @@ python -m torch.distributed.launch \
 \setlength{\parskip}{0.0em}
 \item Imports
 \item Switch from {\tt Module} to {\tt LightningModule}
-\item Fix the {\tt generate()} function
-\item Use the built-in {\tt OneCycleLR} learning rate scheduler
-\item Remove CUDA code from {\tt training\_step()}
+\item The device is established for us
+\item The Learning Rate scheduler is baked in
+\item Lightning handles where the data goes
 \item Generate examples periodically
-\item Initialise {\tt DataIterator} using a {\tt worker\_init\_fn()}
-\item Remove our custom learning rate scheduler code
-\end{enumerate}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Manually apply the diff -- part II}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{0.0cm}
-\begin{enumerate}
-\setlength{\parskip}{0.0em}
-\setcounter{enumi}{8}
-\item Remove the process group code
-\item Lose our DDP configuration
-\item Simplify the random seeding
-\item Fix the steps: minibatches are now implicit
-\item Use a {\tt DataLoader} to sequence data loading
-\item Remove our training loop
-\item Add the {\tt Trainer} code
+\item DataIterator must be managed by a DataLoader
+\item World initialisation is mostly handled by Lightning
+\item The training loop is all Lightning
 \end{enumerate}
 
 \end{column}
@@ -876,8 +819,8 @@ python -m torch.distributed.launch \
 \setlength{\parskip}{0.5em}
 \item The training code is greatly simplified
 \item Lightning is SLURM-aware
-\item So MPI is even easier
-\item We can now switch to other strategies ({\it in theory})
+\item So multi-node training is even easier
+\item We can now switch to other strategies
 \end{enumerate}
 
 \end{column}
@@ -897,18 +840,14 @@ python -m torch.distributed.launch \
 \setlength{\parskip}{0.5em}
 
 \vspace{0.0cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item See {\tt batch-lit-2n8g.sh} for dual-node eight GPU
-\item See {\tt batch-lit-jupyter.sh} to queue from Jupyter
-\end{enumerate}
+See {\tt batch-lit-1n1g.sh} -- {\tt batch-lit-2n4g.sh}
 
 \begin{lstlisting}[backgroundcolor = \color{darkgray},language=shell]
 # From inside a SLURM batch script
 srun python train_gpt2.py
 
-# Queue execution from inside JupyterLab
-sbatch batch-lit-jupyter.sh
+# Queue execution to run
+sbatch batch-lit-1n1g.sh
 \end{lstlisting}
 
 \end{column}
@@ -929,26 +868,6 @@ sbatch batch-lit-jupyter.sh
 
 \vspace{-1.5cm}
 \includegraphics[width=1.0\textwidth]{scaling-a100}
-
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Scaling across nodes on MX1550 (128 GiB) GPUs}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{-1.5cm}
-\includegraphics[width=1.0\textwidth]{scaling-mx1550}
 
 
 \end{column}
