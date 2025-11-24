@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="0.52410024"
-     inkscape:cx="1677.1601"
+     inkscape:cx="1624.6892"
      inkscape:cy="498.95035"
      inkscape:window-width="3456"
      inkscape:window-height="2089"
      inkscape:window-x="0"
      inkscape:window-y="34"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer1"
      inkscape:pageshadow="2">
     <inkscape:grid
        id="grid1"
@@ -394,7 +394,7 @@
          id="tspan11"
          style="fill:#ffffff;stroke-width:1.6"
          x="478.16522"
-         y="341.25452">16 microbatches</tspan></text>
+         y="341.25452">32 microbatches</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
@@ -412,7 +412,7 @@
          id="tspan11-6"
          style="fill:#ffffff;stroke-width:1.6"
          x="448.7449"
-         y="341.25452">8 + 8 microbatches</tspan></text>
+         y="341.25452">16 + 16 microbatches</tspan></text>
     <rect
        style="font-variation-settings:normal;display:inline;opacity:1;vector-effect:none;fill:#c18989;fill-opacity:1;stroke:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
        id="rect2-7-18"
@@ -486,7 +486,7 @@
          id="tspan11-6-9"
          style="fill:#ffffff;stroke-width:1.6"
          x="448.7449"
-         y="341.25452">4 + 4 + 4 + 4 microbatches</tspan></text>
+         y="341.25452">8 + 8 + 8 + 8 microbatches</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.9333px;font-family:sans-serif;-inkscape-font-specification:sans-serif;font-variation-settings:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;opacity:1;vector-effect:none;fill:#8ea0dd;fill-opacity:1;stroke:#ffffff;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none"
