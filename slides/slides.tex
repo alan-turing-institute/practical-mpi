@@ -155,30 +155,6 @@ The last two require {\it more compute}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Types of model parallelism}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{-0.5cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item DDP: Distributed Data Parallel
-\item FSDP: Fully Sharded Data Parallel
-\item DeepSpeed ZeRO: Zero Redundancy Optimiser
-\end{enumerate}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
 \frametitle{Data parallel}
 
 \begin{columns}[T]
@@ -219,50 +195,6 @@ The last two require {\it more compute}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Model parallel DeepSpeed}
-
-\begin{columns}[T]
-\begin{column}[T]{0.8\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{0.0cm}
-\includegraphics[width=1.0\textwidth]{parallel-horizontal}
-
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{DeepSpeed}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{-0.5cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item DeepSpeed Stage 1: optimiser state partitioning
-\item DeepSpeed Stage 2: gradient partitioning
-\item DeepSpeed Stage 3: model parameter partitioning
-\end{enumerate}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
 \frametitle{The plan}
 
 \begin{columns}[T]
@@ -285,31 +217,6 @@ The last two require {\it more compute}
 
 \vspace{0.0cm}
 \includegraphics[width=0.9\textwidth]{karpathy}
-
-\end{column}
-\end{columns}
-
-\end{frame}
-\note{
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{The intention}
-
-\begin{columns}[T]
-\begin{column}[T]{1.0\textwidth}
-\setlength{\parskip}{0.5em}
-
-\vspace{0.0cm}
-\begin{enumerate}
-\setlength{\parskip}{0.5em}
-\item Not to care too much about the model implementation
-\item Understand changes needed to add MPI functionality
-\item For this, we'll rely heavily on {\tt diff}s
-\item Using JupyterLab and SLURM
-\end{enumerate}
 
 \end{column}
 \end{columns}
