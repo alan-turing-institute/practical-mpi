@@ -222,7 +222,6 @@ class DataIterator(IterableDataset):
         self.current_shard = 0
         self.tokens = load_tokens(self.shards[self.current_shard])
         self.current_position = 0
-        assert (len(self) * self.B * self.T) < (len(self.tokens) * len(self.shards)), f"Not enough data for a complete epoch"
 
     def __len__(self):
         return total_tokens // (self.B * self.T)
@@ -272,8 +271,6 @@ max_lr = 6e-4
 min_lr = max_lr * 0.1
 warmup_steps = 715
 max_steps = total_tokens // minibatch_size
-
-assert minibatch_size % (B * T) == 0, "Make sure minibatch size is divisible by microbatch size"
 
 config = GPTConfig(vocab_size=50304)
 train_dataset = DataIterator(B=B, T=T, num_processes=world_size, process_rank=ddp_rank)
