@@ -792,9 +792,9 @@ srun bash -c 'python -m torch.distributed.launch \
 \item The device is established for us
 \item The Learning Rate scheduler is baked in
 \item Lightning handles where the data goes
-\item Generate examples periodically
+\item Drop periodic example generation
 \item DataIterator must be managed by a DataLoader
-\item World initialisation is mostly handled by Lightning
+\item World initialisation now handled by Lightning
 \item The training loop is all Lightning
 \end{enumerate}
 
