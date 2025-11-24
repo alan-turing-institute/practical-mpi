@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --qos turing
 #SBATCH --account vjgo8416-hpc2511
+#SBATCH --reservation vjgo8416-hpc2511
 #SBATCH --time 0:10:0
 #SBATCH --nodes 1
 #SBATCH --gpus-per-node 2
