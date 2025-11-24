@@ -45,7 +45,10 @@ echo "SLURM_GPUS_PER_NODE: ${SLURM_GPUS_PER_NODE}"
 stdbuf -o0 nvidia-smi dmon -o TD -s puct -d 1 > gpu-${SLURM_JOB_ID}.txt &
 
 # Execute the training
-torchrun --standalone --nproc-per-node=1 train_gpt2.py
+python -m torch.distributed.launch \
+    --standalone \
+    --nproc-per-node=1 \
+    train_gpt2.py
 
 echo
 echo "######################################"

@@ -55,7 +55,7 @@ srun bash -c 'python -m torch.distributed.launch \
     --nnodes=${SLURM_NNODES} \
     --master-port=${MASTER_PORT} \
     --master-addr=${MASTER_ADDR} \
-    --node_rank=$SLURM_PROCID \
+    --node_rank=${SLURM_PROCID} \
     train_gpt2.py'
 
 echo
